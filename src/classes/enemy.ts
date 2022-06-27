@@ -5,19 +5,38 @@ export class Enemy {
     health: number = 1000;
     shield: number = 1000;
     baseArmor: number = 1000;
-    get effectiveArmor(): number {
-        return this.baseArmor;
-    };
     healthType: string = "";
     shieldType: string = "";
     armorType: string = "";
 
-    damageModifierVsHealth(damageType: string) {
+    heatStatusTime: number | null = null;
+
+    effectiveArmor(time: number): number {
+        let heatMultiplier: number = 1;
+        if (this.heatStatusTime) {
+            let heatDuration = time - this.heatStatusTime
+            if (heatDuration >= 2.0) {
+                heatMultiplier = 0.5;
+            }
+            else if (heatDuration >= 1.5) {
+                heatMultiplier = 0.6;
+            }
+            else if (heatDuration >= 1.0) {
+                heatMultiplier = 0.7;
+            }
+            else if (heatDuration >= 0.5) {
+                heatMultiplier = 0.85;
+            }
+        }
+        return this.baseArmor * heatMultiplier;
+    };
+
+    damageModifierVsHealth(damageType: string, time: number) {
         let HM: number = damageModifier(this.healthType, damageType);
         let AM: number = damageModifier(this.armorType, damageType);
         let armorEffect: number;
         if (this.armorType != "") {
-            armorEffect = 300/(300+this.effectiveArmor*(1-AM));
+            armorEffect = 300/(300+this.effectiveArmor(time)*(1-AM));
         }
         else {
             armorEffect = 1;
@@ -29,7 +48,7 @@ export class Enemy {
         return damageModifier(this.shieldType, damageType);
     }
 
-    averageDamageModifer(damageType: string) {
+    averageDamageModifer(damageType: string, time: number) {
         let shieldRatio: number;
         if (damageType == "toxin" || this.shieldType == "") {
             shieldRatio = 0;
@@ -37,12 +56,12 @@ export class Enemy {
         else {
             shieldRatio = this.shield / (this.shield + this.health)
         }
-        return this.damageModifierVsShield(damageType) * shieldRatio + this.damageModifierVsHealth(damageType) * (1 - shieldRatio);
+        return this.damageModifierVsShield(damageType) * shieldRatio + this.damageModifierVsHealth(damageType, time) * (1 - shieldRatio);
     }
 
-    effectiveDamage(baseDamage: DamageProfile): number {
+    effectiveDamage(baseDamage: DamageProfile, time: number): number {
         let scaledDamage = baseDamage.map( (damage: number, damageType: string) => {
-            return damage * this.averageDamageModifer(damageType)
+            return damage * this.averageDamageModifer(damageType, time)
         });
         return scaledDamage.total();
 

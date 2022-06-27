@@ -9,19 +9,19 @@
   <div class="row row-cols-4">
     <div class="col-4 mb-3">
       <label class="form-label">Fire Rate</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.fireRate">
+      <input type="number" class="form-control" [(ngModel)]="weapon.fireRate" (change)="statusUpdate()">
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Multishot</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.multishot">
+      <input type="number" class="form-control" [(ngModel)]="weapon.multishot" (change)="statusUpdate()">
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Magazine Size</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.magazineSize">
+      <input type="number" class="form-control" [(ngModel)]="weapon.magazineSize" (change)="statusUpdate()">
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Reload Time</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.reloadTime">
+      <input type="number" class="form-control" [(ngModel)]="weapon.reloadTime" (change)="statusUpdate()">
     </div>
   </div>
   <div class="row row-cols-4">
@@ -39,7 +39,7 @@
     <div class="col-4 mb-3">
       <label class="form-label">Status Chance</label>
       <div class="input-group mb-3">
-        <input type="number" class="form-control" [(ngModel)]="weapon.displayStatusChance">
+        <input type="number" class="form-control" [(ngModel)]="weapon.displayStatusChance" (change)="statusUpdate()">
         <span class="input-group-text">%</span>
       </div>
     </div>
@@ -58,7 +58,7 @@
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Slash</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.damage.slash">
+      <input type="number" class="form-control" [(ngModel)]="weapon.damage.slash" (change)="statusUpdate()">
     </div>
   </div>
   <div class="row">
@@ -75,7 +75,7 @@
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Heat</label>
-      <input type="number" class="form-control" [(ngModel)]="weapon.damage.heat">
+      <input type="number" class="form-control" [(ngModel)]="weapon.damage.heat" (change)="statusUpdate()">
     </div>
     <div class="col-4 mb-3">
       <label class="form-label">Toxin</label>
@@ -187,13 +187,32 @@
   </div>
   <div class="row">
     <div class="col-12 mb-3">
-      <h5>Effective Hit Damage: <span class="result">{{ effectiveHitDamage | number : '1.0-0'}}</span></h5>
-      <h5>Effective DPS: <span class="result">{{ effectiveDPS | number : '1.0-0'}}</span></h5>
+      <h5>Effective Hit Damage: <span class="result">{{ effectiveHitDamage(0) | number : '1.0-0'}}</span></h5>
+      <h5>Effective DPS: <span class="result">{{ effectiveDPS(0) | number : '1.0-0'}}</span></h5>
     </div>
   </div>
   
   <div class="row">
     <h4>Status Damage</h4>
+  </div>
+  <div class="row">
+    <div class="col-12 mb-3">
+      <h5>First Heat Stack Time: <span class="result">{{ this.weapon.firstStackTime('heat') | number : '1.0-2'}}</span></h5>
+    </div>
+  </div>
+  <div class="row">
+    <status-graph 
+      [xData]="this.graphXData" 
+      [hitData]="this.hitData"
+      [slashData]="this.slashData"
+      [heatData]="this.heatData"
+    ></status-graph>
+  </div>
+  <div class="row">
+    <damage-graph 
+      [xData]="this.graphXData" 
+      [damageData]="this.damageData"
+    ></damage-graph>
   </div>
 </div>
 

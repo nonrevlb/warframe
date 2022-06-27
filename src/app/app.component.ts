@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { first } from 'rxjs';
 import { Enemy } from 'src/classes/enemy';
 import { Weapon } from '../classes/weapon'
 
@@ -19,28 +20,69 @@ export class AppComponent {
     return this.weapon.averageStatusStacks(1, "all");
   }
 
-  get effectiveHitDamage(): number {
-    return this.enemy.effectiveDamage(this.weapon.damageWithCrits);
+  effectiveHitDamage(time: number): number {
+    return this.enemy.effectiveDamage(this.weapon.damageWithCrits, time);
   }
 
-  get effectiveDPS(): number {
-    return this.weapon.dps(this.effectiveHitDamage);
+  effectiveDPS(time: number): number {
+    return this.weapon.dps(this.effectiveHitDamage(time));
   }
 
   slashDPS(time: number) {
-    if (time < 1) {
+    let firstStack: number | null = this.weapon.firstStackTime('heat');
+    if (!firstStack) {
+      return 0;
+    }
+    let stackTime: number = time <= 7 + firstStack  ? time - firstStack - 1 : 6;
+
+    if (stackTime < 0) {
       return 0;
     }
 
-    let stackTime: number = time <= 7 ? time - 1 : 6;
-    let slashStacks: number = this.weapon.averageStatusStacks(stackTime, "slash");
-    let slashTick: number = 0.35 * this.weapon.damage["slash"];
+    let stacks: number = this.weapon.averageStatusStacks(stackTime, "slash");
+    let tick: number = 0.35 * this.weapon.damageWithCrits["slash"];
 
-    return slashTick * slashStacks
+    return tick * stacks
+  }
+
+  statusUpdate() {
+    this.enemy.heatStatusTime = this.weapon.firstStackTime('heat');
+  }
+
+  heatDPS(time: number) {
+    let firstStack: number | null = this.weapon.firstStackTime('heat');
+    if (!firstStack) {
+      return 0;
+    }
+    let stackTime: number = time - firstStack - 1;
+    if (stackTime < 0) {
+      return 0;
+    }
+
+    let stacks: number = this.weapon.averageStatusStacks(stackTime, "heat");
+    let tick: number = 0.5 * this.weapon.damageWithCrits.heat;
+
+    let effectiveTick: number = tick * this.enemy.averageDamageModifer("heat", time);
+
+    return effectiveTick * stacks
+  }
+
+  fullDPS(time: number) {
+    return this.effectiveDPS(time) + this.slashDPS(time) + this.heatDPS(time);
   }
 
   get graphXData() {
-    return [...Array(10).keys()];
+    return [...Array(40).keys()].map( x => x/4 );
+  }
+
+  get damageData() {
+    let x = this.graphXData;
+    return x.map(x => this.fullDPS(x));
+  }
+
+  get hitData() {
+    let x = this.graphXData;
+    return x.map(x => this.effectiveDPS(x));
   }
 
   get slashData() {
@@ -48,29 +90,8 @@ export class AppComponent {
     return x.map(x => this.slashDPS(x));
   }
 
-  get statusGraph(): any {
-    return {
-      legend: {
-        data: ['Slash'],
-        align: 'left',
-      },
-      tooltip: {},
-      xAxis: {
-        data: this.graphXData,
-        splitLine: {
-          show: false,
-        },
-      },
-      yAxis: {},
-      series: [
-        {
-          name: 'Slash',
-          type: 'line',
-          data: this.slashData,
-        },
-      ],
-    };
+  get heatData() {
+    let x = this.graphXData;
+    return x.map(x => this.heatDPS(x));
   }
-
-
 }

@@ -7,12 +7,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { NgxEchartsModule } from 'ngx-echarts';
 import { StatusGraphComponent } from './status-graph/status-graph.component';
+import { DamageGraphComponent } from './damage-graph/damage-graph.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    StatusGraphComponent
+    StatusGraphComponent,
+    DamageGraphComponent
   ],
   imports: [
     BrowserModule,

@@ -46,6 +46,16 @@ export class Weapon {
         return this.hitsPerSecond * this.statusChance * chanceOfSpecificStatus * time;
     }
 
+    firstStackTime(damageType: string): number | null {
+        let specificDamage: any = this.damage.get(damageType);
+        if (specificDamage <= 0) {
+            return null;
+        }
+        let chanceOfSpecificStatus: number = specificDamage / this.baseDamage;
+
+        return 1/(this.hitsPerSecond * this.statusChance * chanceOfSpecificStatus)/2
+    }
+
     // Calculated Values
     get hitDPS(): number {
         return this.averageCriticalDamage(this.baseDamage) * this.hitsPerSecond;

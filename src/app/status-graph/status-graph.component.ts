@@ -1,33 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'status-graph',
   templateUrl: './status-graph.component.html',
-  styleUrls: ['./status-graph.component.scss'],
+  styleUrls: ['./status-graph.component.css'],
 })
 export class StatusGraphComponent implements OnInit {
+  @Input() xData!: number[];
+  @Input() hitData!: number[];
+  @Input() slashData!: number[];
+  @Input() heatData!: number[];
+
   options: any;
+  get updateOptions(): any {
+    return {
+      series: [
+        {
+          name: 'Hit',
+          data: this.hitData,
+        },
+        {
+          name: 'Slash',
+          data: this.slashData,
+        },
+        {
+          name: 'Heat',
+          data: this.heatData,
+        }
+      ]
+    };
+  }
   constructor() { }
 
   ngOnInit(): void {
-    const xAxisData = [];
-    const data1 = [];
-    const data2 = [];
-
-    for (let i = 0; i < 100; i++) {
-      xAxisData.push('category' + i);
-      data1.push((Math.sin(i / 5) * (i / 5 - 10) + i / 6) * 5);
-      data2.push((Math.cos(i / 5) * (i / 5 - 10) + i / 6) * 5);
-    }
-
     this.options = {
       legend: {
-        data: ['bar', 'bar2'],
+        data: ['Hit','Slash','Heat'],
         align: 'left',
       },
       tooltip: {},
       xAxis: {
-        data: xAxisData,
+        data: this.xData,
         silent: false,
         splitLine: {
           show: false,
@@ -36,16 +49,22 @@ export class StatusGraphComponent implements OnInit {
       yAxis: {},
       series: [
         {
-          name: 'bar',
-          type: 'bar',
-          data: data1,
+          name: 'Hit',
+          type: 'line',
+          data: this.hitData,
           animationDelay: (idx: number) => idx * 10,
         },
         {
-          name: 'bar2',
-          type: 'bar',
-          data: data2,
-          animationDelay: (idx: number) => idx * 10 + 100,
+          name: 'Slash',
+          type: 'line',
+          data: this.slashData,
+          animationDelay: (idx: number) => idx * 10,
+        },
+        {
+          name: 'Heat',
+          type: 'line',
+          data: this.heatData,
+          animationDelay: (idx: number) => idx * 10,
         },
       ],
       animationEasing: 'elasticOut',
