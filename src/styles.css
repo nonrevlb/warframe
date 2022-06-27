@@ -1,1 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
+
+body {
+    background-color: rgb(65, 65, 65);
+    color: white;
+}
+
+.result {
+    font-weight: bold;
+    color:rgb(0, 207, 79);
+}
+
+.form-control {
+    background-color: rgb(117, 117, 117) !important;
+    color: white !important;
+}
+
+.header {
+    padding: 40px 0px 20px 120px;
+    vertical-align: middle;
+}
+
+.logo {
+    vertical-align: middle;
+    display: inline;
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+    border-radius: 75px;
+}
+
+.header h1 {
+    vertical-align: middle;
+    padding: 48px;
+    display: inline;
+}
+
+.row h4 {
+    padding-top: 20px;
+}
+
+.row {
+    margin-left: 20px;
+}
